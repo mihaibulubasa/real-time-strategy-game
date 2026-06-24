@@ -14,6 +14,7 @@ public class Game extends JPanel implements ActionListener {
     private long lastFPSTime = System.nanoTime();
     private int frames = 0;
     private int fps = 0;
+    Army test;
 
     public Game() {
         setLayout(null);
@@ -27,6 +28,7 @@ public class Game extends JPanel implements ActionListener {
         mouseManager.addMouseScrolledObserver(camera);
         map = new Map(64, mouseManager);
         player = new Player(map);
+        test = player.getArmies().get(0);
         player.connectObservers(mouseManager);
         map.connectObservers();
         timer.start();

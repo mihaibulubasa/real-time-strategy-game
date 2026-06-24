@@ -19,7 +19,7 @@ public class Astar {
         }
     }
 
-    private double getDistance(Cell a, Cell b) {
+    public static double getDistance(Cell a, Cell b) {
         return Math.sqrt((a.col - b.col) * (a.col - b.col) + (a.row - b.row) * (a.row - b.row));
     }
 

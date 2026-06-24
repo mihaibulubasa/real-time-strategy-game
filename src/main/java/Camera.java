@@ -61,10 +61,11 @@ public class Camera implements MouseDraggedObserver, MouseScrolled{
     @Override
     public void onMouseScrolled(int x, int y, int amount) {
         double oldZoomFactor = zoomFactor;
+        double zoomAmount = 0.2;
         if(amount < 0) {
-            zoomFactor += 0.1;
+            zoomFactor += zoomAmount;
         } else if(zoomFactor > 1){
-            zoomFactor -= 0.1;
+            zoomFactor -= zoomAmount;
         }
         double mapX = (x - this.x) / oldZoomFactor;
         double mapY = (y - this.y) / oldZoomFactor;

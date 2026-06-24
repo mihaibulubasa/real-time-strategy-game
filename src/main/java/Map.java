@@ -10,6 +10,7 @@ public class Map {
     private List<Building> buildings;
     private List<Army> armies;
     private List<Drawable> entities;
+    public Army test;
 
     public Map(int length, MouseManager mouseManager) {
         this.mouseManager = mouseManager;
@@ -23,11 +24,15 @@ public class Map {
                 map[y][x] = new Cell(y, x);
             }
         }
+        test = new Army(12, "Enemy", map[12][12]);
+        test.setAuto(true);
+        armies.add(test);
+        entities.add(test);
     }
 
     public void tick() {
         for(Army army : armies) {
-            army.tick();
+            army.tick(this);
         }
         entities.sort(Comparator.comparingInt(Drawable::getLocationOnScreen));
     }

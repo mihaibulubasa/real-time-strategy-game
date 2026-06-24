@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class MapMenu extends JPanel implements ActionListener, ObjectClickedObserver {
     private JComboBox comboBox;
@@ -19,16 +20,14 @@ public class MapMenu extends JPanel implements ActionListener, ObjectClickedObse
             }
         }
         if(player.getGameMode() == GameMode.ATTACK_MODE) {
-            comboBox = new JComboBox<>(player.getArmies().toArray());
+            comboBox = new JComboBox<>(getArmyArray(player));
             player.setPlacedArmy((Army) comboBox.getSelectedItem());
-            comboBox.addActionListener(this);
-            add(comboBox);
         } else if(player.getGameMode() == GameMode.EDIT_MODE) {
-            comboBox = new JComboBox(player.getBuildings().toArray());
+            comboBox = new JComboBox(getBuildingArray(player));
             player.setCurrentBuilding((Building)comboBox.getSelectedItem());
-            comboBox.addActionListener(this);
-            add(comboBox);
         }
+        comboBox.addActionListener(this);
+        add(comboBox);
         changeGameMode.addActionListener(this);
         add(changeGameMode);
     }
@@ -39,7 +38,6 @@ public class MapMenu extends JPanel implements ActionListener, ObjectClickedObse
             GameMode gameMode = (GameMode) changeGameMode.getSelectedItem();
             player.setGameMode(gameMode);
             setComboBox();
-
         }
         if(e.getSource() == comboBox) {
             if(player.getGameMode() == GameMode.EDIT_MODE) {
@@ -53,22 +51,31 @@ public class MapMenu extends JPanel implements ActionListener, ObjectClickedObse
     }
 
     private void setComboBox() {
-        if(comboBox != null) {
-            remove(comboBox);
-        }
+        comboBox.removeActionListener(this);
         if(player.getGameMode() == GameMode.ATTACK_MODE) {
-            comboBox = new JComboBox<>(player.getArmies().toArray());
+            Object[] armies = getArmyArray(player);
+            comboBox.setModel(new DefaultComboBoxModel<>(armies));
             player.setPlacedArmy((Army) comboBox.getSelectedItem());
-            comboBox.addActionListener(this);
-            add(comboBox);
         } else if(player.getGameMode() == GameMode.EDIT_MODE) {
-            comboBox = new JComboBox(player.getBuildings().toArray());
+            Object[] buildings = getBuildingArray(player);
+            comboBox.setModel(new DefaultComboBoxModel<>(buildings));
             player.setCurrentBuilding((Building)comboBox.getSelectedItem());
-            comboBox.addActionListener(this);
-            add(comboBox);
         }
-        revalidate();
-        repaint();
+        comboBox.addActionListener(this);
+    }
+
+    private Army[] getArmyArray(Player player) {
+        Army[] armyArray = player.getArmies().toArray(new Army[0]);
+        Army[] newArmyArray = new Army[armyArray.length + 1];
+        System.arraycopy(armyArray, 0, newArmyArray, 1, armyArray.length);
+        return newArmyArray;
+    }
+
+    private Building[] getBuildingArray(Player player) {
+        Building[] buildingArray = player.getBuildings().toArray(new Building[0]);
+        Building[] newBuildingArray = new Building[buildingArray.length + 1];
+        System.arraycopy(buildingArray, 0, newBuildingArray, 1, buildingArray.length);
+        return newBuildingArray;
     }
 
     @Override

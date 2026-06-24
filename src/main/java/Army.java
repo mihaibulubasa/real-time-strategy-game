@@ -19,18 +19,26 @@ public class Army implements Drawable, MouseRightClicked{
     private Animation animation;
     private boolean selected;
     private List<ArmySelectedObserver> observers;
+    private Army followingArmy = null;
+    private boolean following;
+    private int attackRange;
+    private int followRange;
+    private boolean auto;
+    private Cell nextLocation;
 
     public Army(int amount, String type, Cell location) {
         this.amount = amount;
         observers = new ArrayList<>();
         path = null;
+        attackRange = 5;
+        followRange = 12;
         this.type = type;
         if(location != null) {
             this.location = location;
             x = location.x[0];
             y = location.y[1];
         }
-        speed = 2.0;
+        speed = 1.1;
         moving = false;
         directionX = 0;
         directionY = 0;
@@ -41,7 +49,7 @@ public class Army implements Drawable, MouseRightClicked{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        nextLocation = null;
     }
 
     public void render(Graphics g, Camera camera) {
@@ -52,6 +60,7 @@ public class Army implements Drawable, MouseRightClicked{
         if(xt + (wt) >= 0 && xt - (wt / 2) <= camera.getWidth() && yt + ht >= 0 && yt <= camera.getHeight()) {
             g.drawImage(animation.getCurrentFrame(), xt, yt, wt, ht,null);
         }
+
         if(selected) {
             g.setColor(Color.red);
             g.drawRect(xt, yt, wt, ht);
@@ -66,8 +75,34 @@ public class Army implements Drawable, MouseRightClicked{
         observers.remove(observer);
     }
 
-    public void tick() {
+    private void findEnemies(Map map) {
+        if(following) {
+            return;
+        }
+        for(Army army : map.getArmies()) {
+            if(army == this) {
+                continue;
+            }
+            if(army.getLocation() == null) {
+                continue;
+            }
+            double distance = Astar.getDistance(location, army.getLocation());
+            if(distance <= followRange) {
+                followingArmy = army;
+                following = true;
+                break;
+            }
+        }
+    }
+
+    public void tick(Map map) {
         animation.animate();
+        if(auto) {
+            findEnemies(map);
+        }
+        if(following) {
+            followArmy(map);
+        }
         if (moving) {
             x += directionX;
             y += directionY;
@@ -75,6 +110,10 @@ public class Army implements Drawable, MouseRightClicked{
                 x = targetX;
                 y = targetY;
                 moving = false;
+                if(nextLocation != null) {
+                    location = nextLocation;
+                    nextLocation = null;
+                }
                 if (path != null && !path.isEmpty()) {
                     moveTo(path.remove(0));
                 } else {
@@ -84,12 +123,23 @@ public class Army implements Drawable, MouseRightClicked{
         }
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public String getType() {
-        return type;
+    private void followArmy(Map map){
+        double distance = Astar.getDistance(location, followingArmy.getLocation());
+        if(distance > followRange) {
+            followingArmy = null;
+            following = false;
+            path.clear();
+        } else if(distance <= attackRange) {
+            if(path != null) {
+                path.clear();
+            }
+        } else {
+            if(path == null || path.isEmpty() || !path.get(path.size() - 1).equals(followingArmy.getLocation())) {
+                Astar astar = new Astar();
+                ArrayList<Cell> newPath = astar.findPath(this, map, followingArmy.getLocation());
+                followPath(newPath);
+            }
+        }
     }
 
     public Cell getLocation() {
@@ -102,7 +152,7 @@ public class Army implements Drawable, MouseRightClicked{
     }
 
     public void moveTo(Cell destination) {
-        location = destination;
+        nextLocation = destination;
         targetX = destination.x[0];
         targetY = destination.y[1];
         double dx = targetX - x;
@@ -125,7 +175,9 @@ public class Army implements Drawable, MouseRightClicked{
         }
         this.path = new ArrayList<>(path);
         animation.startAnimate();
-        moveTo(this.path.remove(0));
+        if(!moving) {
+            moveTo(this.path.remove(0));
+        }
     }
 
     public void setLocation(Cell location) {
@@ -155,4 +207,13 @@ public class Army implements Drawable, MouseRightClicked{
             selected = false;
         }
     }
+
+    public void setAuto(boolean auto){
+        this.auto = auto;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
 }

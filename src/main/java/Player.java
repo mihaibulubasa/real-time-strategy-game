@@ -20,6 +20,10 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
         buildings.add(new Castle(null));
         armies.add(new Army(100, "Front Line soldiers", null));
         armies.add(new Army(70, "Back Line archers", null));
+        for(Army army : armies) {
+            army.setAuto(false);
+            army.setSpeed(3);
+        }
     }
 
     public void setMap(Map map) {
