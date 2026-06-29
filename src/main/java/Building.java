@@ -8,6 +8,7 @@ public abstract class Building implements Drawable{
     protected BufferedImage image;
     protected int onScreenWidth;
     protected int onScreenHeight;
+    protected int locationOnScreen;
 
     public Building(Cell location) {
         setLocation(location);
@@ -43,17 +44,13 @@ public abstract class Building implements Drawable{
             double k = (double) image.getWidth() / (double) onScreenWidth;
             onScreenHeight = (int)(image.getHeight() / k);
             image = ImageHandler.resizeImage(image, onScreenWidth, onScreenHeight);
+            locationOnScreen = new Cell(location.row, location.col - width).y[1];
         }
     }
 
     @Override
     public int getLocationOnScreen() {
-        return new Cell(location.row, location.col - width).y[1];
-    }
-
-    public void resize(int factor) {
-        onScreenHeight = factor * onScreenHeight;
-        onScreenWidth = factor * onScreenWidth;
+        return locationOnScreen;
     }
 
 }

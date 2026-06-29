@@ -30,7 +30,7 @@ public class Army implements Drawable, MouseRightClicked{
         this.amount = amount;
         observers = new ArrayList<>();
         path = null;
-        attackRange = 5;
+        attackRange = 3;
         followRange = 12;
         this.type = type;
         if(location != null) {
