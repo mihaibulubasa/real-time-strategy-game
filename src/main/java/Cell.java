@@ -17,6 +17,7 @@ public class Cell implements MouseMovedObserver, MouseClickedObserver {
     private BufferedImage image;
     private Building building;
     protected int[] x, y;
+    protected Polygon space;
 
     public Cell(int row, int col) {
         this.row = row;
@@ -35,6 +36,7 @@ public class Cell implements MouseMovedObserver, MouseClickedObserver {
         y[1] = (row + col + 1) * (cellheight / 2);
         y[2] = (row + col + 2) * (cellheight / 2);
         y[3] = (row + col + 1) * (cellheight / 2);
+        space = new Polygon(x, y, 4);
         try {
             image = ImageHandler.resizeImage(ImageIO.read(new File("src/resources/grass.png")), cellwidth, cellheight);
         } catch (IOException e) {
@@ -80,19 +82,14 @@ public class Cell implements MouseMovedObserver, MouseClickedObserver {
         clickedObservers.remove(observer);
     }
 
-    protected boolean isHovered(int x, int y) {
-        Polygon p = new Polygon(this.x, this.y, 4);
-        return p.contains(x, y);
-    }
-
     @Override
     public void mouseMoved(int x, int y) {
-        hover = isHovered(x, y);
+        hover = space.contains(x, y);
     }
 
     @Override
     public void objectClicked(int x, int y) {
-        if(isHovered(x, y)) {
+        if(space.contains(x, y)) {
             List<ObjectClickedObserver> copy = new ArrayList<>(clickedObservers);
             for(ObjectClickedObserver observer : copy) {
                 observer.click(col, row);
@@ -114,6 +111,10 @@ public class Cell implements MouseMovedObserver, MouseClickedObserver {
 
     public Building getBuilding() {
         return building;
+    }
+
+    public Polygon getSpace() {
+        return space;
     }
 
 }

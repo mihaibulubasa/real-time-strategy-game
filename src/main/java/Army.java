@@ -60,7 +60,6 @@ public class Army implements Drawable, MouseRightClicked{
         if(xt + (wt) >= 0 && xt - (wt / 2) <= camera.getWidth() && yt + ht >= 0 && yt <= camera.getHeight()) {
             g.drawImage(animation.getCurrentFrame(), xt, yt, wt, ht,null);
         }
-
         if(selected) {
             g.setColor(Color.red);
             g.drawRect(xt, yt, wt, ht);
@@ -87,7 +86,7 @@ public class Army implements Drawable, MouseRightClicked{
                 continue;
             }
             double distance = Astar.getDistance(location, army.getLocation());
-            if(distance <= followRange) {
+            if(distance < followRange) {
                 followingArmy = army;
                 following = true;
                 break;
@@ -101,19 +100,23 @@ public class Army implements Drawable, MouseRightClicked{
             findEnemies(map);
         }
         if(following) {
-            followArmy(map);
+            double distance = Astar.getDistance(location, followingArmy.getLocation());
+            if(distance < followRange && distance > attackRange) {
+                followArmy(map);
+            } else {
+                stopFollowing();
+            }
         }
         if (moving) {
             x += directionX;
             y += directionY;
+            if(!location.getSpace().contains(x, y)) {
+                location = nextLocation;
+            }
             if (Math.abs(x - targetX) <= speed && Math.abs(y - targetY) <= speed) {
                 x = targetX;
                 y = targetY;
                 moving = false;
-                if(nextLocation != null) {
-                    location = nextLocation;
-                    nextLocation = null;
-                }
                 if (path != null && !path.isEmpty()) {
                     moveTo(path.remove(0));
                 } else {
@@ -124,21 +127,20 @@ public class Army implements Drawable, MouseRightClicked{
     }
 
     private void followArmy(Map map){
-        double distance = Astar.getDistance(location, followingArmy.getLocation());
-        if(distance > followRange) {
-            followingArmy = null;
+        if(path == null || path.isEmpty() || !path.get(path.size() - 1).equals(followingArmy.getLocation())) {
+            Astar astar = new Astar();
+            ArrayList<Cell> newPath = astar.findPath(this, map, followingArmy.getLocation());
+            followPath(newPath);
+        }
+    }
+
+    public void stopFollowing() {
+        if(following) {
             following = false;
+            followingArmy = null;
+        }
+        if(path != null) {
             path.clear();
-        } else if(distance <= attackRange) {
-            if(path != null) {
-                path.clear();
-            }
-        } else {
-            if(path == null || path.isEmpty() || !path.get(path.size() - 1).equals(followingArmy.getLocation())) {
-                Astar astar = new Astar();
-                ArrayList<Cell> newPath = astar.findPath(this, map, followingArmy.getLocation());
-                followPath(newPath);
-            }
         }
     }
 
