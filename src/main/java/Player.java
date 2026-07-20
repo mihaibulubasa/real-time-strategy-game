@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player implements ObjectClickedObserver, ArmySelectedObserver {
+public class Player implements ObjectClickedObserver, ArmySelectedObserver{
     private Map map;
     private List<Building> buildings;
     private List<Army> armies;
@@ -9,8 +9,12 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
     private Building currentBuilding;
     private Army placedArmy;
     private GameMode gameMode;
+    private Camera gameCamera;
+    private List<ArmyPlacedObserver> armyPlacedObservers;
+    private List<BuildingObserver> buildingObservers;
 
     public Player(Map map) {
+        gameCamera = new Camera(1000, -500);
         gameMode = GameMode.ATTACK_MODE;
         setMap(map);
         buildings = new ArrayList<>();
@@ -24,6 +28,8 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
             army.setAuto(false);
             army.setSpeed(3);
         }
+        armyPlacedObservers = new ArrayList<>();
+        buildingObservers = new ArrayList<>();
     }
 
     public void setMap(Map map) {
@@ -33,11 +39,6 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
                 map.getCell(i, j).addObserver(this);
             }
         }
-    }
-
-    public void placeArmy(Army army) {
-        map.placeArmy(army);
-        armies.remove(army);
     }
 
     public void placeBuilding(Building building) {
@@ -52,17 +53,31 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
         if(gameMode == GameMode.EDIT_MODE) {
             if(!map.getCell(y, x).isEmpty()) {
                 buildings.add(map.getCell(y,x).getBuilding());
+                for(BuildingObserver observer : buildingObservers) {
+                    observer.onBuildingDestroyed(map.getCell(y, x).getBuilding());
+                }
                 map.destroyBuilding(map.getCell(y,x).getBuilding());
+
             } else {
                 if(currentBuilding != null) {
                     currentBuilding.setLocation(map.getCell(y, x));
                     placeBuilding(currentBuilding);
+                    for(BuildingObserver observer : buildingObservers) {
+                        observer.onBuildingPlaced(map.getCell(y, x).getBuilding());
+                    }
                 }
             }
         } else if(gameMode == GameMode.ATTACK_MODE){
             if(placedArmy != null) {
                 placedArmy.setLocation(map.getCell(y, x));
-                placeArmy(placedArmy);
+                armies.remove(placedArmy);
+                if(currentArmy != null) {
+                    currentArmy.setSelected(false);
+                    currentArmy = null;
+                }
+                for(ArmyPlacedObserver armyPlacedObserver : armyPlacedObservers) {
+                    armyPlacedObserver.onArmyPlaced(placedArmy);
+                }
             }
             if(currentArmy != null) {
                 Astar astar = new Astar();
@@ -91,10 +106,6 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
         this.gameMode = gameMode;
     }
 
-    public void setCurrentArmy(Army currentArmy) {
-        this.currentArmy = currentArmy;
-    }
-
     public void setCurrentBuilding(Building building) {
         this.currentBuilding = building;
     }
@@ -103,11 +114,17 @@ public class Player implements ObjectClickedObserver, ArmySelectedObserver {
         this.placedArmy = placedArmy;
     }
 
-    public void connectObservers(MouseManager mouseManager) {
-        for(Army army : armies) {
-            army.addObserver(this);
-            mouseManager.addRightClickObserver(army);
-        }
+    public void connectObservers(MouseManager mouseManager, EntityManager entityManager) {
+        mouseManager.addMouseDraggedObserver(gameCamera);
+        mouseManager.addMouseScrolledObserver(gameCamera);
+        armyPlacedObservers.add(entityManager);
+        mouseManager.addRightClickObserver(entityManager);
+        entityManager.addArmySelectedObserver(this);
+        buildingObservers.add(entityManager);
+    }
+
+    public Camera getGameCamera() {
+        return gameCamera;
     }
 
     @Override

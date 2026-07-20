@@ -79,7 +79,7 @@ public class Astar {
             path.add(cell);
             cell = prev[cell.row][cell.col].cell;
             if(cell == null) {
-                return null;
+                return new ArrayList<>();
             }
         }
         return path;
@@ -103,11 +103,9 @@ public class Astar {
         search(map, destination, prev, visited, heap);
         if(visited[destination.row][destination.col] == State.CHECKED) {
             ArrayList<Cell> path = recreatePath(destination, army.getLocation(), prev);
-            if(path != null) {
-                Collections.reverse(path);
-                return path;
-            }
+            Collections.reverse(path);
+            return path;
         }
-        return null;
+        return new ArrayList<>();
     }
 }

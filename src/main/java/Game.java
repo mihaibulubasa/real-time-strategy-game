@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 public class Game extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
-    private Camera camera;
     private Timer timer;
     private Map map;
     private MouseManager mouseManager;
@@ -14,21 +13,20 @@ public class Game extends JPanel implements ActionListener {
     private long lastFPSTime = System.nanoTime();
     private int frames = 0;
     private int fps = 0;
+    private EntityManager entityManager;
 
     public Game() {
         setLayout(null);
         timer = new Timer(0, this);
-        camera = new Camera(1000, -500);
-        mouseManager = new MouseManager(camera);
+        entityManager = new EntityManager();
+        map = new Map(64);
+        player = new Player(map);
+        mouseManager = new MouseManager(player.getGameCamera());
+        player.connectObservers(mouseManager, entityManager);
+        map.connectObservers(mouseManager);
         addMouseListener(mouseManager);
         addMouseMotionListener(mouseManager);
         addMouseWheelListener(mouseManager);
-        mouseManager.addMouseDraggedObserver(camera);
-        mouseManager.addMouseScrolledObserver(camera);
-        map = new Map(64, mouseManager);
-        player = new Player(map);
-        player.connectObservers(mouseManager);
-        map.connectObservers();
         timer.start();
     }
 
@@ -45,7 +43,9 @@ public class Game extends JPanel implements ActionListener {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
-        map.render(g, camera);
+        map.render(g, player.getGameCamera());
+        entityManager.render(g, player.getGameCamera());
+        map.renderHover(g, player.getGameCamera());
         frames++;
         long now = System.nanoTime();
         if(now - lastFPSTime > 1000000000L) {
@@ -59,7 +59,7 @@ public class Game extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        map.tick();
+        entityManager.tick(map);
         repaint();
     }
 }

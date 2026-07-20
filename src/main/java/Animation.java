@@ -8,7 +8,7 @@ public class Animation {
     private boolean animating;
 
     public Animation(BufferedImage image, int frameCount, int width, int height, int targetWidth, int targetHeight) {
-        speed = 100;
+        speed = 50;
         timer = 0;
         lastTime = System.currentTimeMillis();
         this.frameCount = frameCount;

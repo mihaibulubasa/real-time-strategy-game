@@ -3,9 +3,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class Army implements Drawable, MouseRightClicked{
+public class Army implements Drawable{
     private int amount;
     private String type;
     private Cell location;
@@ -18,7 +17,6 @@ public class Army implements Drawable, MouseRightClicked{
     private ArrayList<Cell> path;
     private Animation animation;
     private boolean selected;
-    private List<ArmySelectedObserver> observers;
     private Army followingArmy = null;
     private boolean following;
     private int attackRange;
@@ -28,7 +26,6 @@ public class Army implements Drawable, MouseRightClicked{
 
     public Army(int amount, String type, Cell location) {
         this.amount = amount;
-        observers = new ArrayList<>();
         path = null;
         attackRange = 3;
         followRange = 12;
@@ -66,19 +63,11 @@ public class Army implements Drawable, MouseRightClicked{
         }
     }
 
-    public void addObserver(ArmySelectedObserver observer) {
-        observers.add(observer);
-    }
-
-    public void removeObserver(ArmySelectedObserver observer) {
-        observers.remove(observer);
-    }
-
-    private void findEnemies(Map map) {
+    private void findEnemies(EntityManager entityManager) {
         if(following) {
             return;
         }
-        for(Army army : map.getArmies()) {
+        for(Army army : entityManager.getArmies()) {
             if(army == this) {
                 continue;
             }
@@ -94,10 +83,10 @@ public class Army implements Drawable, MouseRightClicked{
         }
     }
 
-    public void tick(Map map) {
+    public void tick(Map map, EntityManager entityManager) {
         animation.animate();
         if(auto) {
-            findEnemies(map);
+            findEnemies(entityManager);
         }
         if(following) {
             double distance = Astar.getDistance(location, followingArmy.getLocation());
@@ -193,21 +182,10 @@ public class Army implements Drawable, MouseRightClicked{
         return type + " " + amount;
     }
 
-    @Override
-    public void rightClick(int x, int y) {
+
+    public boolean wasClicked(int x, int y){
         Rectangle rect = new Rectangle((int)this.x - (width / 2), (int)this.y - (height / 2), width, height);
-        Army army;
-        if (rect.contains(x, y)) {
-            if(!selected) {
-                army = this;
-                for(ArmySelectedObserver observer : observers) {
-                    observer.armySelected(army);
-                }
-            }
-            selected = !selected;
-        } else {
-            selected = false;
-        }
+        return rect.contains(x, y);
     }
 
     public void setAuto(boolean auto){
@@ -218,4 +196,11 @@ public class Army implements Drawable, MouseRightClicked{
         this.speed = speed;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
 }

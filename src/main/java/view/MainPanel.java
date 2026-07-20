@@ -1,0 +1,99 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainPanel extends JPanel {
+
+    private TileView[][] grid;
+    private Camera camera;
+    private int width, height;
+    private long lastFPSTime = System.nanoTime();
+    private int frames = 0;
+    private int fps = 0;
+    private List<Drawable> drawables;
+    private String[] players;
+
+    public MainPanel(int width, int height){
+        this.width = width;
+        this.height = height;
+        grid = new TileView[width][height];
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                grid[i][j] = new TileView(i, j);
+            }
+        }
+        setLayout(null);
+        setBackground(Color.black);
+        drawables = new ArrayList<>();
+        camera = new Camera(500, 0, this);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        camera.render(g);
+        frames++;
+        long now = System.nanoTime();
+        if(now - lastFPSTime > 1000000000L) {
+            fps = frames;
+            frames = 0;
+            lastFPSTime = now;
+        }
+        g.setColor(Color.WHITE);
+        g.drawString("FPS: " + fps, 10, 20);
+        if(players != null) {
+            for (int i = 0; i < players.length; i++) {
+                g.drawString(players[i], 1850, 20 + 20 * i);
+            }
+        }
+    }
+
+    public int getGridWidth(){
+        return width;
+    }
+
+    public int getGridHeight(){
+        return height;
+    }
+
+    public TileView[][] getGrid() {
+        return grid;
+    }
+
+    public void setTileView(int i, int j){
+        grid[i][j] = new TileView(i, j);
+    }
+
+    public Camera getCamera(){
+        return camera;
+    }
+
+    public void setCamera(Camera camera){
+        this.camera = camera;
+    }
+
+    public List<Drawable> getDrawables() {
+        return drawables;
+    }
+
+    public void setGridSize(int width, int height){
+        this.width = width;
+        this.height = height;
+        grid = new TileView[height][width];
+    }
+
+    public void updatePlayerList(String token) {
+        players = token.split(",");
+        repaint();
+    }
+
+    public void addArmy(int row, int col){
+        ArmyView armyView = new ArmyView(grid[row][col]);
+        drawables.add(armyView);
+        armyView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
+        repaint();
+    }
+}
