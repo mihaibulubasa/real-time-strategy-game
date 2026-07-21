@@ -9,12 +9,9 @@ public class Animation {
     private boolean animating;
     private long speed, timer, lastTime;
 
-    public Animation(BufferedImage image, int numberOfFrames, int width, int height) {
+    public Animation(BufferedImage[] frames, int numberOfFrames) {
         this.numberOfFrames = numberOfFrames;
-        frames = new BufferedImage[numberOfFrames];
-        for(int i = 0; i < numberOfFrames; i++) {
-            frames[i] = image.getSubimage(i * width, 0, width, height);
-        }
+        this.frames = frames;
         currentFrame = 0;
         animating = false;
         speed = 100;
@@ -50,5 +47,9 @@ public class Animation {
     public void stopAnimation() {
         animating = false;
         currentFrame = 0;
+    }
+
+    public void setFrames(BufferedImage[] frames) {
+        this.frames = frames;
     }
 }

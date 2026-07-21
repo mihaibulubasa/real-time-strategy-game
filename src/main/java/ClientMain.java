@@ -4,9 +4,13 @@ import javax.swing.*;
 
 public class ClientMain {
     public static void main(String[] args) {
+        startClient();
+    }
+
+    public static void startClient() {
         SwingUtilities.invokeLater(() -> {
-                GameController gc = new GameController("localhost", 8080);
-                gc.start();
+            GameController gc = new GameController("localhost", 8080);
+            gc.start();
         });
     }
 }

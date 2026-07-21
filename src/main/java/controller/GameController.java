@@ -1,8 +1,7 @@
 package controller;
 
 import network.GameClient;
-import view.Frame;
-import view.TileView;
+import view.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +13,7 @@ public class GameController implements ActionListener {
     private Frame frame;
     private MouseHandler mouse;
     private LoginController loginController;
+    private KeyHandler keyHandler;
     private Timer timer;
 
     private GameClient gameClient;
@@ -22,6 +22,7 @@ public class GameController implements ActionListener {
         frame = new Frame();
         mouse = new MouseHandler(this);
         timer = new Timer(0, this);
+        keyHandler = new KeyHandler(this);
         try {
             gameClient = new GameClient(ip, port, this);
             Thread thread = new Thread(gameClient);
@@ -60,6 +61,34 @@ public class GameController implements ActionListener {
         }
     }
 
+    public void multiSelectArmy() {
+        MainPanel mainPanel = frame.getMainPanel();
+        for(Drawable armyView : mainPanel.getDrawables()) {
+            if(armyView instanceof ArmyView) {
+                ((ArmyView) armyView).setSelected(mainPanel.getSelect().intersects(armyView.getHitBox()));
+            }
+        }
+    }
+
+    public void selectArmy(int x, int y) {
+        MainPanel mainPanel = frame.getMainPanel();
+        ArmyView selected = null;
+        for(Drawable armyView : mainPanel.getDrawables()) {
+            if(armyView instanceof ArmyView) {
+                if(selected == null) {
+                    if(armyView.getHitBox().contains(x, y)) {
+                        selected = (ArmyView) armyView;
+                        selected.setSelected(!selected.getSelected());
+                    } else {
+                        ((ArmyView) armyView).setSelected(false);
+                    }
+                } else {
+                    ((ArmyView) armyView).setSelected(false);
+                }
+            }
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         frame.getMainPanel().repaint();
@@ -79,5 +108,9 @@ public class GameController implements ActionListener {
 
     public GameClient getGameClient() {
         return gameClient;
+    }
+
+    public KeyHandler getKeyHandler() {
+        return keyHandler;
     }
 }

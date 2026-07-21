@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainPanel extends JPanel {
 
@@ -15,6 +16,8 @@ public class MainPanel extends JPanel {
     private int fps = 0;
     private List<Drawable> drawables;
     private String[] players;
+    private Rectangle select;
+    private Point start;
 
     public MainPanel(int width, int height){
         this.width = width;
@@ -28,6 +31,7 @@ public class MainPanel extends JPanel {
         setLayout(null);
         setBackground(Color.black);
         drawables = new ArrayList<>();
+        select = new Rectangle();
         camera = new Camera(500, 0, this);
     }
 
@@ -49,6 +53,31 @@ public class MainPanel extends JPanel {
                 g.drawString(players[i], 1850, 20 + 20 * i);
             }
         }
+        g.setColor(new Color(124, 128, 0, 145));
+        g.fillRect(select.x, select.y, select.width, select.height);
+    }
+
+    public void initSelect(int x, int y){
+        start = new Point(x, y);
+        select = new Rectangle(x, y, 0, 0);
+    }
+
+    public void updateSelect(int x, int y) {
+        if(start == null) {
+            return;
+        }
+        int newX = Math.min(start.x, x);
+        int newY = Math.min(start.y, y);
+        int width = Math.abs(x - start.x);
+        int height = Math.abs(y - start.y);
+        select.setBounds(newX, newY, width, height);
+        repaint();
+    }
+
+    public void resetSelect() {
+        start = null;
+        select = new Rectangle();
+        repaint();
     }
 
     public int getGridWidth(){
@@ -95,5 +124,9 @@ public class MainPanel extends JPanel {
         drawables.add(armyView);
         armyView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
         repaint();
+    }
+
+    public Rectangle getSelect() {
+        return select;
     }
 }

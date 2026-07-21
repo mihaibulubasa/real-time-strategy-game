@@ -11,6 +11,7 @@ public class TileView {
     private Image image;
     private boolean hover;
     private Rectangle drawingBounds;
+    private static Color hoverColor = new Color(20, 69, 33, 130);
 
     public TileView(int col, int row){
         this.col = col;
@@ -42,7 +43,7 @@ public class TileView {
             g.drawImage(image, x - currentWidth / 2, y, currentWidth, currentHeight, null);
         }
         if(hover) {
-            g.setColor(new Color(20, 69, 33, 130));
+            g.setColor(hoverColor);
             g.fillPolygon(hitBox);
         }
     }
@@ -66,7 +67,13 @@ public class TileView {
         this.drawingBounds = new Rectangle(x - currentWidth / 2, y, currentWidth, currentHeight);
     }
 
-
+    public static void changeHover(boolean command){
+        if(command) {
+            hoverColor =  new Color(28, 77, 108, 130);
+        } else {
+            hoverColor = new Color(20, 69, 33, 130);
+        }
+    }
 
     public void setHover(boolean hover) {
         this.hover = hover;

@@ -17,6 +17,9 @@ public class InitResponse {
             panel.addMouseWheelListener(controller.getMouse());
             panel.addMouseListener(controller.getMouse());
             panel.addMouseMotionListener(controller.getMouse());
+            panel.addKeyListener(controller.getKeyHandler());
+            panel.setFocusable(true);
+            panel.requestFocus();
             controller.getTimer().start();
             controller.getFrame().getMainPanel().repaint();
         });

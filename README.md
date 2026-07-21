@@ -1,14 +1,12 @@
 # Instructions
-## 2 modes  
- * **ATTACK MODE**  
-   - lets you choose an army to place  
-   - lets you right-click an army on the grid to select 
-   - click on any empty tile to move the selected army to that tile 
- * **EDIT MODE**  
-   - lets you choose a building to place
-   - lets you place a building anywhere on the grid where there is space by clicking on a tile 
-   - lets you remove buildings by clicking them 
+Run the project from Main.java(you can set it up from IntelliJ). Make sure the port 8080 is free. There are 2 available usernames that let you connect to the server  
+ * **admin**
+ * **admin2**
 
-## Controls
- - Drag the mouse with right-click held to drag the map
- - Scroll to zoom in/out(or use the touchpad, it has the same functionality)
+# Commands
+- **drag right-click** : lets you pan the map
+- **scroll** : lets you zoom in/out the map
+- **left-click** : places an army at the Tile the mouse is hovering
+- **s + left-click** : selects/unselects the army the mouse is hovering
+- **a** : will activate the command option(not implemented yet), for now it just changes the color of the hovering
+- **s + drag left-click** : selects all the armies inside the selection square. it will also unselect everything that is not inside the square

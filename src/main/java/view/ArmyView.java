@@ -10,6 +10,7 @@ public class ArmyView implements Drawable{
     private int width, height;
     private int currentWidth, currentHeight;
     private Rectangle hitBox;
+    private boolean selected;
 
     public ArmyView(TileView location){
         this.location = location;
@@ -19,7 +20,7 @@ public class ArmyView implements Drawable{
         width = 256;
         height = 256;
         hitBox = new Rectangle(x, y, width, height);
-        animation = TextureLoader.getInstance().getAnimation(TextureType.ARMY_WALK);
+        animation = new Animation(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_WALK), 16);
         animation.startAnimation();
     }
 
@@ -48,4 +49,16 @@ public class ArmyView implements Drawable{
         return 0;
     }
 
+    public boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if(selected) {
+            animation.setFrames(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_SELECT_WALK));
+        } else {
+            animation.setFrames(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_WALK));
+        }
+    }
 }

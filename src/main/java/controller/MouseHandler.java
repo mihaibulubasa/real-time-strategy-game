@@ -13,6 +13,8 @@ public class MouseHandler extends MouseAdapter {
     private MainPanel mainPanel;
     private int button;
     private Point lastDraggedPoint;
+    private boolean isPressed;
+    private Point startClick;
 
     public MouseHandler(GameController gameController) {
         this.gameController = gameController;
@@ -21,8 +23,35 @@ public class MouseHandler extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         super.mousePressed(e);
+        isPressed = true;
+        startClick = e.getPoint();
         button = e.getButton();
         lastDraggedPoint = e.getPoint();
+        if(gameController.getKeyHandler().isSelect()) {
+            gameController.getFrame().getMainPanel().initSelect(e.getX(), e.getY());
+        }
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        super.mouseReleased(e);
+        isPressed = false;
+        if(startClick.distance(e.getPoint()) < 5) {
+            onClick(e);
+        } else {
+            gameController.multiSelectArmy();
+        }
+        gameController.getKeyHandler().setSelect(false);
+        gameController.getFrame().getMainPanel().resetSelect();
+    }
+
+    private void onClick(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            if(gameController.getKeyHandler().isSelect()) {
+                gameController.selectArmy(e.getX(), e.getY());
+            } else {
+                gameController.clickTile(e.getX(), e.getY());
+            }
+        }
     }
 
     @Override
@@ -31,15 +60,13 @@ public class MouseHandler extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        gameController.clickTile(e.getX(), e.getY());
-    }
-
-    @Override
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
         if(button == MouseEvent.BUTTON3) {
             mainPanel.getCamera().setPos(e.getX() - lastDraggedPoint.x, e.getY() - lastDraggedPoint.y);
+        }
+        if(button == MouseEvent.BUTTON1 && gameController.getKeyHandler().isSelect()) {
+            mainPanel.updateSelect(e.getX(), e.getY());
         }
         lastDraggedPoint = e.getPoint();
     }
@@ -52,6 +79,10 @@ public class MouseHandler extends MouseAdapter {
 
     public void setMainPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
+    }
+
+    public boolean isPressed() {
+        return isPressed;
     }
 
 }

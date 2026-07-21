@@ -6,6 +6,10 @@ import network.GameServer;
 
 public class ServerMain {
     public static void main(String[] args) {
+        startServer();
+    }
+
+    public static void startServer() {
         int mapWidth = 64;
         int mapHeight = 64;
         MapGrid mapGrid = new MapGrid(mapWidth, mapHeight);
@@ -18,5 +22,4 @@ public class ServerMain {
         System.out.println("Server Started");
         server.listen();
     }
-
 }
