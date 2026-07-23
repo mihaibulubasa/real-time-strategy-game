@@ -73,6 +73,16 @@ public class GameClient implements Runnable{
                     controller.getFrame().getMainPanel().addArmy(row, col);
                 });
                 break;
+            case "ADD_BUILDING" :
+                String textureName = tokens[1];
+                row = Integer.parseInt(tokens[2]);
+                col = Integer.parseInt(tokens[3]);
+                int width = Integer.parseInt(tokens[4]);
+                int height = Integer.parseInt(tokens[5]);
+                SwingUtilities.invokeLater(() -> {
+                    controller.getFrame().getMainPanel().addBuilding(textureName, row, col, width, height);
+                });
+                break;
             default:
                 break;
         }

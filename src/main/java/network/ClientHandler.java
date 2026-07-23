@@ -57,6 +57,9 @@ public class ClientHandler implements Runnable{
             case "PLACE_ARMY" :
                 server.addArmy(player, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
                 break;
+            case "PLACE_BUILDING" :
+                server.addBuilding(player, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+                break;
             default:
                 break;
         }

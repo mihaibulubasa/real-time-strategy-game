@@ -42,9 +42,11 @@ public class Game {
         if(!location.isEmpty()) {
             return false;
         }
-        mapGrid.placeBuilding(building, location);
-        player.addBuilding(building);
-        return true;
+        boolean placed = mapGrid.placeBuilding(building, location);
+        if(placed) {
+            player.addBuilding(building);
+        }
+        return placed;
     }
 
     public void removeBuilding(Player player, Building building){

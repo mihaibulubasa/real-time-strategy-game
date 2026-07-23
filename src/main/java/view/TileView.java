@@ -11,15 +11,32 @@ public class TileView {
     private Image image;
     private boolean hover;
     private Rectangle drawingBounds;
+    private BuildingView buildingView;
     private static Color hoverColor = new Color(20, 69, 33, 130);
 
-    public TileView(int col, int row){
+    public TileView(int row, int col){
         this.col = col;
         this.row = row;
         width = 256;
         height = 128;
         image = TextureLoader.getInstance().getTexture(TextureType.TILE_IMAGE);
         recalculateGeometry(1.0, 0, 0);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getCurrentWidth() {
+        return currentWidth;
+    }
+
+    public int getCurrentHeight() {
+        return currentHeight;
     }
 
     public int getX(){
@@ -75,8 +92,24 @@ public class TileView {
         }
     }
 
+    public int getCol() {
+        return col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
     public void setHover(boolean hover) {
         this.hover = hover;
+    }
+
+    public void setBuildingView(BuildingView buildingView) {
+        this.buildingView = buildingView;
+    }
+
+    public BuildingView getBuildingView() {
+        return buildingView;
     }
 
     public Rectangle getDrawingBounds(){

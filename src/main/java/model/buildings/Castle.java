@@ -4,12 +4,12 @@ public class Castle extends Building{
 
     public Castle(String name){
         super(name);
-        width = 5;
-        height = 5;
+        width = 7;
+        height = 7;
     }
 
     @Override
     public String getTexture() {
-        return "CASTLE";
+        return "CASTLE_IMAGE";
     }
 }

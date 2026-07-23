@@ -20,7 +20,7 @@ public class ArmyView implements Drawable{
         width = 256;
         height = 256;
         hitBox = new Rectangle(x, y, width, height);
-        animation = new Animation(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_WALK), 16);
+        animation = new Animation(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_WALK), 16, 75);
         animation.startAnimation();
     }
 
@@ -45,8 +45,8 @@ public class ArmyView implements Drawable{
     }
 
     @Override
-    public int getDepth() {
-        return 0;
+    public double getDepth() {
+        return location.getCol() + location.getRow();
     }
 
     public boolean getSelected() {
@@ -60,5 +60,9 @@ public class ArmyView implements Drawable{
         } else {
             animation.setFrames(TextureLoader.getInstance().getAnimationFrames(TextureType.ARMY_WALK));
         }
+    }
+
+    public TileView getLocation() {
+        return location;
     }
 }

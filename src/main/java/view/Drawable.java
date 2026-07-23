@@ -4,7 +4,7 @@ import java.awt.*;
 
 public interface Drawable {
     void render(Graphics g);
-    int getDepth();
+    double getDepth();
     void recalculateGeometry(double zoomFactor, int cameraX, int cameraY);
     Rectangle getHitBox();
 }

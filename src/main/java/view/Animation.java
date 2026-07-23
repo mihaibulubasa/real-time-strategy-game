@@ -9,12 +9,12 @@ public class Animation {
     private boolean animating;
     private long speed, timer, lastTime;
 
-    public Animation(BufferedImage[] frames, int numberOfFrames) {
+    public Animation(BufferedImage[] frames, int numberOfFrames, long speed) {
         this.numberOfFrames = numberOfFrames;
         this.frames = frames;
         currentFrame = 0;
         animating = false;
-        speed = 100;
+        this.speed = speed;
     }
 
     public void animate(){

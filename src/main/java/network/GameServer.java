@@ -3,6 +3,9 @@ package network;
 import model.Army;
 import model.Game;
 import model.Player;
+import model.buildings.Building;
+import model.buildings.Castle;
+import model.buildings.House;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GameServer {
     private final Game game;
     private final int port;
+    private int caca;
 
     private List<ClientHandler> clients;
 
@@ -60,13 +64,27 @@ public class GameServer {
     }
 
     public void addArmy(Player player,int row, int col){
-        Army army = new Army("Army");
-        army.setLocation(game.getMapGrid().getTile(row, col));
-        player.addArmy(army);
-        game.getEntityHandler().addArmy(army);
-        for(ClientHandler client : clients){
-            client.sendMessage("ADD_ARMY:" + row + ':' + col);
+        boolean deployed = game.deployArmy(player, new Army("Army"), row, col);
+        if(deployed){
+            for(ClientHandler client : clients){
+                client.sendMessage("ADD_ARMY:" + row + ':' + col);
+            }
         }
+    }
 
+    public void addBuilding(Player player, int row, int col){
+        Building building;
+        if(caca % 2 == 0) {
+            building = new House("The TownHall");
+        } else {
+            building = new Castle("The Black Castle");
+        }
+        boolean placed = game.placeBuilding(player, building, row, col);
+        if(placed) {
+            caca++;
+            for(ClientHandler client : clients){
+                client.sendMessage("ADD_BUILDING:" + building.getTexture() + ":"+ row + ':' + col + ":" + building.getWidth() + ":" + building.getHeight());
+            }
+        }
     }
 }

@@ -2,9 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class MainPanel extends JPanel {
 
@@ -18,11 +17,14 @@ public class MainPanel extends JPanel {
     private String[] players;
     private Rectangle select;
     private Point start;
+    private List<TileView> selected;
+    private SelectionView selectionView;
 
     public MainPanel(int width, int height){
         this.width = width;
         this.height = height;
-        grid = new TileView[width][height];
+        grid = new TileView[height][width];
+        selectionView = new SelectionView();
         for(int i = 0; i < height; i++){
             for(int j = 0; j < width; j++){
                 grid[i][j] = new TileView(i, j);
@@ -38,6 +40,7 @@ public class MainPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        sortDrawables();
         camera.render(g);
         frames++;
         long now = System.nanoTime();
@@ -57,6 +60,10 @@ public class MainPanel extends JPanel {
         g.fillRect(select.x, select.y, select.width, select.height);
     }
 
+    public void sortDrawables() {
+        drawables.sort(Comparator.comparingDouble(Drawable::getDepth));
+    }
+
     public void initSelect(int x, int y){
         start = new Point(x, y);
         select = new Rectangle(x, y, 0, 0);
@@ -71,13 +78,11 @@ public class MainPanel extends JPanel {
         int width = Math.abs(x - start.x);
         int height = Math.abs(y - start.y);
         select.setBounds(newX, newY, width, height);
-        repaint();
     }
 
     public void resetSelect() {
         start = null;
         select = new Rectangle();
-        repaint();
     }
 
     public int getGridWidth(){
@@ -108,25 +113,34 @@ public class MainPanel extends JPanel {
         return drawables;
     }
 
-    public void setGridSize(int width, int height){
-        this.width = width;
-        this.height = height;
-        grid = new TileView[height][width];
-    }
-
     public void updatePlayerList(String token) {
         players = token.split(",");
-        repaint();
     }
 
     public void addArmy(int row, int col){
         ArmyView armyView = new ArmyView(grid[row][col]);
         drawables.add(armyView);
         armyView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
-        repaint();
+    }
+
+    public void addBuilding(String name, int row, int col, int width, int height) {
+        BuildingView buildingView = new BuildingView(name, grid[row][col], width, height);
+        drawables.add(buildingView);
+        buildingView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
     }
 
     public Rectangle getSelect() {
         return select;
+    }
+
+    public TileView getTileView(int i, int j) {
+        if(i < 0 || i >= height || j < 0 || j >= width) {
+            return null;
+        }
+        return grid[i][j];
+    }
+
+    public SelectionView getSelectionView() {
+        return selectionView;
     }
 }

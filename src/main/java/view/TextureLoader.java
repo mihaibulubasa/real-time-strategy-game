@@ -19,7 +19,11 @@ public class TextureLoader {
         images = new HashMap<>();
         animationFrames = new HashMap<>();
         BufferedImage TILE_IMAGE = loadTexture("src/resources/grass.png", 256, 128);
+        BufferedImage CASTLE_IMAGE = loadTexture("src/resources/castle.png", 256, 128);
+        BufferedImage HOUSE_IMAGE = loadTexture("src/resources/house.png", 256, 128);
         images.put(TextureType.TILE_IMAGE, TILE_IMAGE);
+        images.put(TextureType.CASTLE_IMAGE, CASTLE_IMAGE);
+        images.put(TextureType.HOUSE_IMAGE, HOUSE_IMAGE);
         BufferedImage[] ARMY_WALK = splitTexture("src/resources/army.png", 4096, 256, 16);
         BufferedImage[] ARMY_SELECT_WALK = splitTexture("src/resources/army_select.png", 4096, 256, 16);
         animationFrames.put(TextureType.ARMY_WALK, ARMY_WALK);
@@ -40,7 +44,7 @@ public class TextureLoader {
         } catch (IOException e) {
             return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         }
-        return resizeImage(image, width, height);
+        return image;
     }
 
     public BufferedImage[] splitTexture(String name, int width, int height, int frames) {
@@ -51,17 +55,6 @@ public class TextureLoader {
             list[i] = rawImage.getSubimage(i * newWidth, 0, newWidth, height);
         }
         return list;
-    }
-
-    public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, originalImage.getType());
-        Graphics2D g2d = resizedImage.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-        g2d.dispose();
-        return resizedImage;
     }
 
     public BufferedImage getTexture(TextureType name) {
