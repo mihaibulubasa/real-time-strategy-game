@@ -61,7 +61,7 @@ public class MainPanel extends JPanel {
     }
 
     public void sortDrawables() {
-        drawables.sort(Comparator.comparingDouble(Drawable::getDepth));
+        drawables.sort(Drawable::compare);
     }
 
     public void initSelect(int x, int y){

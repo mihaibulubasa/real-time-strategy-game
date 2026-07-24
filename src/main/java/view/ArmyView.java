@@ -45,8 +45,10 @@ public class ArmyView implements Drawable{
     }
 
     @Override
-    public double getDepth() {
-        return location.getCol() + location.getRow();
+    public Line getDepth() {
+        Point left = new Point(x, y + currentHeight - location.getCurrentHeight() / 2);
+        Point right = new Point(x + currentWidth, y + currentHeight - location.getCurrentHeight() / 2);
+        return new Line(left, right);
     }
 
     public boolean getSelected() {

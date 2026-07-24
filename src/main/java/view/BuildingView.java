@@ -25,22 +25,20 @@ public class BuildingView implements Drawable{
         height = (int)(image.getHeight() * ratio);
         x = location.getX() - (gridWidth * (location.getWidth() / 2));
         y = location.getY() + location.getHeight() - height;
-        y = location.getY() + location.getHeight() - baseHeight;
+        baseY = location.getY() + location.getHeight() - baseHeight;
         hitBox = new Rectangle(x, y, width, height);
     }
 
     @Override
     public void render(Graphics g) {
         g.drawImage(image, x, y, currentWidth, currentHeight, null);
-//        g.setColor(Color.red);
-//        g.drawRect(x, baseY, currentWidth, currentBaseHeight);
     }
 
     @Override
-    public double getDepth() {
-        double leftDist = location.getCol() - (gridWidth - 1) + location.getRow();
-        double rightDist = location.getCol() + location.getRow() - (gridHeight - 1);
-        return (leftDist + rightDist) / 2;
+    public Line getDepth() {
+        Point left = new Point(x, baseY + (gridHeight * (location.getCurrentHeight() / 2)));
+        Point right = new Point(x + currentWidth, baseY + (gridWidth * (location.getCurrentHeight() / 2)));
+        return new Line(left, right);
     }
 
     @Override

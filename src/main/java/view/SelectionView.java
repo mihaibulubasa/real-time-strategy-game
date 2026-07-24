@@ -1,14 +1,18 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SelectionView {
     private ArmyView root;
     private List<ArmyView> selected;
+    private Map<ArmyView, TileView> mapping;
 
     public SelectionView() {
         selected = new ArrayList<>();
+        mapping = new HashMap<>();
         root = null;
     }
 
@@ -23,6 +27,7 @@ public class SelectionView {
 
     public void removeSelected(ArmyView selected) {
         this.selected.remove(selected);
+        mapping.remove(selected);
         if(this.selected.isEmpty()) {
             root = null;
         } else {
@@ -36,12 +41,13 @@ public class SelectionView {
             int j = tileview.getCol() + (armyview.getLocation().getCol() - root.getLocation().getCol());
             TileView relative = panel.getTileView(i, j);
             if(relative != null) {
+                mapping.put(armyview, relative);
                 relative.setHover(true);
             }
         }
     }
 
-    public List<ArmyView> getSelected() {
-        return selected;
+    public TileView getDestination(ArmyView selectedArmy) {
+        return mapping.get(selectedArmy);
     }
 }
