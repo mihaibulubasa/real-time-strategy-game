@@ -50,4 +50,8 @@ public class Tile {
         return "TILE_IMAGE";
     }
 
+    @Override
+    public String toString() {
+        return col + ", " + row ;
+    }
 }

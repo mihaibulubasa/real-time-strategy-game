@@ -1,8 +1,10 @@
 package network;
 
+import controller.Astar;
 import model.Army;
 import model.Game;
 import model.Player;
+import model.Tile;
 import model.buildings.Building;
 import model.buildings.Castle;
 import model.buildings.House;
@@ -10,12 +12,14 @@ import model.buildings.House;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameServer {
     private final Game game;
     private final int port;
+    private final Astar astar;
     private int caca;
 
     private List<ClientHandler> clients;
@@ -24,6 +28,7 @@ public class GameServer {
         this.game = game;
         this.port = port;
         clients = new CopyOnWriteArrayList<>();
+        astar = new Astar();
     }
 
     public void listen(){
@@ -64,11 +69,29 @@ public class GameServer {
     }
 
     public void addArmy(Player player,int row, int col){
-        boolean deployed = game.deployArmy(player, new Army("Army"), row, col);
+        Army army = new Army("Army");
+        boolean deployed = game.deployArmy(player, army, row, col);
         if(deployed){
             for(ClientHandler client : clients){
-                client.sendMessage("ADD_ARMY:" + row + ':' + col);
+                client.sendMessage("ADD_ARMY:" + army.getId() + ":" + row + ':' + col);
             }
+        }
+    }
+
+    public void commandArmy(long id, int row, int col) {
+        Army army = game.getEntityHandler().getArmy(id);
+        Tile destination = game.getMapGrid().getTile(row, col);
+        Tile start = army.getLocation();
+        ArrayList<Tile> path = astar.findPath(start, game.getMapGrid(), destination);
+        army.followPath(path);
+        StringBuilder sendPath = new StringBuilder();
+        sendPath.append("PATH:").append(army.getId()).append(":");
+        for(Tile tile : path) {
+            System.out.println("[SERVER] " + tile);
+            sendPath.append(tile.getRow()).append(":").append(tile.getCol()).append(":");
+        }
+        for(ClientHandler client : clients){
+            client.sendMessage(sendPath.toString());
         }
     }
 
@@ -83,8 +106,12 @@ public class GameServer {
         if(placed) {
             caca++;
             for(ClientHandler client : clients){
-                client.sendMessage("ADD_BUILDING:" + building.getTexture() + ":"+ row + ':' + col + ":" + building.getWidth() + ":" + building.getHeight());
+                client.sendMessage("ADD_BUILDING:" + building.getId() + ":"+ building.getTexture() + ":"+ row + ':' + col + ":" + building.getWidth() + ":" + building.getHeight());
             }
         }
+    }
+
+    public Astar getAstar() {
+        return astar;
     }
 }

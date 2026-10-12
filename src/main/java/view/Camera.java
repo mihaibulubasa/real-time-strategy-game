@@ -1,6 +1,8 @@
 package view;
 
+
 import java.awt.*;
+import java.util.List;
 
 public class Camera {
     private int x, y;
@@ -53,7 +55,7 @@ public class Camera {
         }
     }
 
-    public void render(Graphics g){
+    public void render(Graphics g, List<Drawable> drawableList){
         for(int i = 0; i < panel.getGridHeight(); i++) {
             for(int j = 0; j < panel.getGridWidth(); j++) {
                 if(bounds.intersects(panel.getGrid()[i][j].getDrawingBounds())) {
@@ -61,7 +63,7 @@ public class Camera {
                 }
             }
         }
-        for(Drawable d : panel.getDrawables()) {
+        for(Drawable d : drawableList) {
             if(bounds.intersects(d.getHitBox())) {
                 d.render(g);
             }

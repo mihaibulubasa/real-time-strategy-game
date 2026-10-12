@@ -65,6 +65,13 @@ public class GameController implements ActionListener {
         }
     }
 
+    public void commandArmy() {
+        SelectionView selectionView = frame.getMainPanel().getSelectionView();
+        for(ArmyView armyView : selectionView.getSelected()) {
+            gameClient.sendMessage("MOVE_ARMY:" + armyView.getId() + ":" + selectionView.getDestination(armyView).getRow() + ":" + selectionView.getDestination(armyView).getCol());
+        }
+    }
+
     public void placeArmy(int x, int y){
         TileView[][] grid = frame.getMainPanel().getGrid();
         for(int i = 0; i < frame.getMainPanel().getGridHeight(); i++) {

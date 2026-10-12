@@ -60,6 +60,9 @@ public class ClientHandler implements Runnable{
             case "PLACE_BUILDING" :
                 server.addBuilding(player, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
                 break;
+            case "MOVE_ARMY" :
+                server.commandArmy(Long.parseLong(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]));
+                break;
             default:
                 break;
         }
@@ -98,8 +101,11 @@ public class ClientHandler implements Runnable{
         StringBuilder buildings = new StringBuilder();
         for(Building b : game.getMapGrid().getBuildings()){
             buildings
+                    .append(b.getId()).append(",")
                     .append(b.getLocation().getRow()).append(",")
                     .append(b.getLocation().getCol()).append(",")
+                    .append(b.getWidth()).append(",")
+                    .append(b.getHeight()).append(",")
                     .append(b.getTexture()).append(",");
         }
         out.println("TILE_GRID_INIT:"+ width + ":" + height + ":"+ tiles);
@@ -110,6 +116,7 @@ public class ClientHandler implements Runnable{
         StringBuilder entities = new StringBuilder();
         for(Army army : game.getEntityHandler().getArmies()) {
             entities
+                    .append(army.getId()).append(",")
                     .append(army.getLocation().getRow()).append(",")
                     .append(army.getLocation().getCol()).append(",");
         }

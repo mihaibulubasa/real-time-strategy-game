@@ -1,8 +1,11 @@
 package network;
 
 import controller.GameController;
+import network.parsers.BuildingsInitResponse;
 import network.parsers.EntitiesInitResponse;
 import network.parsers.InitResponse;
+import view.ArmyView;
+import view.TileView;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -10,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class GameClient implements Runnable{
 
@@ -17,7 +22,6 @@ public class GameClient implements Runnable{
     private BufferedReader in;
     private PrintWriter out;
     private GameController controller;
-
 
     public GameClient(String ip, int port, GameController controller) throws IOException {
         socket = new Socket(ip, port);
@@ -66,21 +70,44 @@ public class GameClient implements Runnable{
                     });
                 }
                 break;
+            case "BUILDINGS_INIT" :
+                if(tokens.length == 2) {
+                    SwingUtilities.invokeLater(() -> {
+                        BuildingsInitResponse.parseResponse(controller, tokens[1]);
+                    });
+                }
+                break;
             case "ADD_ARMY" :
-                int row = Integer.parseInt(tokens[1]);
-                int col = Integer.parseInt(tokens[2]);
+                long id = Long.parseLong(tokens[1]);
+                int row = Integer.parseInt(tokens[2]);
+                int col = Integer.parseInt(tokens[3]);
                 SwingUtilities.invokeLater(() -> {
-                    controller.getFrame().getMainPanel().addArmy(row, col);
+                    controller.getFrame().getMainPanel().addArmy(id, row, col);
                 });
                 break;
             case "ADD_BUILDING" :
-                String textureName = tokens[1];
-                row = Integer.parseInt(tokens[2]);
-                col = Integer.parseInt(tokens[3]);
-                int width = Integer.parseInt(tokens[4]);
-                int height = Integer.parseInt(tokens[5]);
+                id = Long.parseLong(tokens[1]);
+                String textureName = tokens[2];
+                row = Integer.parseInt(tokens[3]);
+                col = Integer.parseInt(tokens[4]);
+                int width = Integer.parseInt(tokens[5]);
+                int height = Integer.parseInt(tokens[6]);
                 SwingUtilities.invokeLater(() -> {
-                    controller.getFrame().getMainPanel().addBuilding(textureName, row, col, width, height);
+                    controller.getFrame().getMainPanel().addBuilding(id, textureName, row, col, width, height);
+                });
+                break;
+            case "PATH" :
+                id = Long.parseLong(tokens[1]);
+                ArmyView armyView = controller.getFrame().getMainPanel().getArmyView(id);
+                LinkedList<TileView> path = new LinkedList<>();
+                SwingUtilities.invokeLater(() -> {
+                   for(int i = 2; i < tokens.length; i+=2) {
+                       int row2 = Integer.parseInt(tokens[i]);
+                       int col2 = Integer.parseInt(tokens[i+1]);
+                       System.out.println(row2 + " " + col2);
+                       path.add(controller.getFrame().getMainPanel().getTileView(row2, col2));
+                   }
+                   armyView.setPath(path);
                 });
                 break;
             default:

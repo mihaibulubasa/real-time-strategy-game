@@ -59,6 +59,8 @@ public class MouseHandler extends MouseAdapter {
                 gameController.placeArmy(e.getX(), e.getY());
             } else if(gameController.getKeyHandler().isPlaceBuilding()) {
                 gameController.placeBuilding(e.getX(), e.getY());
+            } else if(gameController.getKeyHandler().isCommand()) {
+                gameController.commandArmy();
             }
         }
     }

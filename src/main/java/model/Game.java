@@ -2,6 +2,7 @@ package model;
 
 import model.buildings.Building;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,12 +11,15 @@ import java.util.Map;
 public class Game {
     private MapGrid mapGrid;
     private EntityHandler entityHandler;
+    private Timer timer;
     private Map<String, Player> players;
 
     public Game(MapGrid mapGrid, EntityHandler entityHandler) {
         this.mapGrid = mapGrid;
         this.entityHandler = entityHandler;
         players = new HashMap<>();
+        timer = new Timer(0, e -> entityHandler.tick());
+        timer.start();
     }
 
     public void tick(){

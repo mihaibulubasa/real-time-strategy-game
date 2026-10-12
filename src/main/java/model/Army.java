@@ -37,7 +37,6 @@ public class Army {
                     nextLocation = path.removeFirst();
                     previousLocation = location;
                     movementProgress = 0;
-                    nextLocation.setEmpty(false);
                 } else {
                     moving = false;
                     path.clear();
@@ -50,9 +49,6 @@ public class Army {
         }
         movementProgress += speed;
         if(movementProgress >= 0.5 && location != nextLocation) {
-            if(previousLocation != null) {
-                previousLocation.setEmpty(true);
-            }
             location = nextLocation;
         }
         if(movementProgress >= 1) {
@@ -63,13 +59,7 @@ public class Army {
     }
 
     public void setLocation(Tile location) {
-        if(this.location != null) {
-            this.location.setEmpty(true);
-        }
         this.location = location;
-        if(this.location != null) {
-            this.location.setEmpty(false);
-        }
     }
 
     public void followPath(ArrayList<Tile> path) {

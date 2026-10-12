@@ -1,9 +1,6 @@
 package view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SelectionView {
     private ArmyView root;
@@ -49,5 +46,9 @@ public class SelectionView {
 
     public TileView getDestination(ArmyView selectedArmy) {
         return mapping.get(selectedArmy);
+    }
+
+    public List<ArmyView> getSelected() {
+        return selected;
     }
 }

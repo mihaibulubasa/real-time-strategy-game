@@ -13,7 +13,7 @@ public class MainPanel extends JPanel {
     private long lastFPSTime = System.nanoTime();
     private int frames = 0;
     private int fps = 0;
-    private List<Drawable> drawables;
+    private Map<Long, Drawable> drawables;
     private String[] players;
     private Rectangle select;
     private Point start;
@@ -32,7 +32,7 @@ public class MainPanel extends JPanel {
         }
         setLayout(null);
         setBackground(Color.black);
-        drawables = new ArrayList<>();
+        drawables = new HashMap<>();
         select = new Rectangle();
         camera = new Camera(500, 0, this);
     }
@@ -40,8 +40,7 @@ public class MainPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        sortDrawables();
-        camera.render(g);
+        camera.render(g, sortDrawables());
         frames++;
         long now = System.nanoTime();
         if(now - lastFPSTime > 1000000000L) {
@@ -60,8 +59,10 @@ public class MainPanel extends JPanel {
         g.fillRect(select.x, select.y, select.width, select.height);
     }
 
-    public void sortDrawables() {
-        drawables.sort(Drawable::compare);
+    public List<Drawable> sortDrawables() {
+        List<Drawable> drawablesArr = new ArrayList<>(drawables.values());
+        drawablesArr.sort(Drawable::compare);
+        return drawablesArr;
     }
 
     public void initSelect(int x, int y){
@@ -83,6 +84,14 @@ public class MainPanel extends JPanel {
     public void resetSelect() {
         start = null;
         select = new Rectangle();
+    }
+
+    public ArmyView getArmyView(long id) {
+        return (ArmyView)drawables.get(id);
+    }
+
+    public BuildingView getBuildingView(long id) {
+        return (BuildingView)drawables.get(id);
     }
 
     public int getGridWidth(){
@@ -109,23 +118,23 @@ public class MainPanel extends JPanel {
         this.camera = camera;
     }
 
-    public List<Drawable> getDrawables() {
-        return drawables;
+    public Collection<Drawable> getDrawables() {
+        return drawables.values();
     }
 
     public void updatePlayerList(String token) {
         players = token.split(",");
     }
 
-    public void addArmy(int row, int col){
-        ArmyView armyView = new ArmyView(grid[row][col]);
-        drawables.add(armyView);
+    public void addArmy(long id, int row, int col){
+        ArmyView armyView = new ArmyView(id, grid[row][col]);
+        drawables.put(id, armyView);
         armyView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
     }
 
-    public void addBuilding(String name, int row, int col, int width, int height) {
+    public void addBuilding(long id, String name, int row, int col, int width, int height) {
         BuildingView buildingView = new BuildingView(name, grid[row][col], width, height);
-        drawables.add(buildingView);
+        drawables.put(id, buildingView);
         buildingView.recalculateGeometry(camera.getZoomFactor(), camera.getX(), camera.getY());
     }
 
